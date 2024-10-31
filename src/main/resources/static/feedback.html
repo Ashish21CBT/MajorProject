@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Form</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #1abc9c;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #16a085;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #12876f;
+        }
+        .message {
+            color: green;
+            text-align: center;
+        }
+        .error {
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Feedback Form</h2>
+    <div id="message" class="message"></div>
+    <div id="error" class="error"></div>
+    <input type="text" id="teacherId" placeholder="Teacher ID" required>
+    <textarea id="feedbackContent" placeholder="Your Feedback" required></textarea>
+    <button id="submitFeedback">Submit Feedback</button>
+</div>
+
+<script>
+    document.getElementById('submitFeedback').addEventListener('click', function() {
+        const teacherId = document.getElementById('teacherId').value;
+        const feedbackContent = document.getElementById('feedbackContent').value;
+
+        // Basic validation
+        if (!teacherId || !feedbackContent) {
+            document.getElementById('error').textContent = 'Please fill in all fields.';
+            return;
+        }
+
+        // Send a POST request to the feedback endpoint
+        fetch('/feedback/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ teacherId: teacherId, feedback: feedbackContent })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Feedback submission failed');
+            }
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById('message').textContent = data;
+            document.getElementById('error').textContent = '';
+            // Clear input fields
+            document.getElementById('teacherId').value = '';
+            document.getElementById('feedbackContent').value = '';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('error').textContent = 'Error submitting feedback: ' + error.message;
+        });
+    });
+</script>
+
+</body>
+</html>
